@@ -4,7 +4,7 @@ A [short, self contained and correct (compilable) example](http://sscce.org/) fo
 
 # What is this trying to show?
 
-TODO: add link to isse
+This repo was created for [this issue](https://github.com/node-opcua/node-opcua/issues/569).
 
 ![screencap](screencap.jpg)
 
