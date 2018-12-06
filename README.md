@@ -6,6 +6,8 @@ A [short, self contained and correct (compilable) example](http://sscce.org/) fo
 
 TODO: add link to isse
 
+![screencap](screencap.jpg)
+
 # Installation
 
 ```
