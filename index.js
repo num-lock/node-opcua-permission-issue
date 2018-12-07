@@ -29,7 +29,8 @@ return server.start((err) => {
 
     const addressSpace = server.engine.addressSpace;
 
-    const node = addressSpace.findNode('ns=3;i=6001');
+    const index = addressSpace.getNamespaceIndex('http://yourorganisation.org/customnodeset/');
+    const node = addressSpace.findNode(`ns=${index};i=6001`);
     if (node) {
         node.bindVariable({
             get: () => {
