@@ -1,4 +1,5 @@
 const path = require('path');
+const crypto = require('crypto');
 
 const opcua = require('node-opcua');
 
@@ -28,6 +29,21 @@ const server = new opcua.OPCUAServer({
     allowAnonymous: false
 });
 
+const nodeValueGenerators = {
+    '6001': () => {
+        return Math.random() * 10 + 20
+    },
+    '6002': () => {
+        return Math.random() < 0.5
+    },
+    '6003': () => {
+        return crypto.randomBytes(4).toString('hex')
+    },
+    '6004': () => {
+        return Math.floor(Math.random() * 100);
+    }
+};
+
 return server.start((err) => {
     if (err) {
         return console.log(err);
@@ -36,25 +52,29 @@ return server.start((err) => {
     const addressSpace = server.engine.addressSpace;
 
     const index = addressSpace.getNamespaceIndex('http://yourorganisation.org/customnodeset/');
-    const node = addressSpace.findNode(`ns=${index};i=6001`);
-    if (node) {
-        node.bindVariable({
-            get: () => {
-                return new opcua.Variant({
-                        dataType: opcua.DataType.Double,
-                        value: Math.random() * 10 + 20
-                    }
-                );
-            },
-            set: (variant) => {
-                return opcua.StatusCodes.Good;
+    for (let nodeId in nodeValueGenerators) {
+        const node = addressSpace.findNode(`ns=${index};i=${nodeId}`);
+        if (node) {
+            const dataType = addressSpace.findNode(node.dataType).browseName.name;
+            node.bindVariable({
+                get: () => {
+                    return new opcua.Variant({
+                            dataType: dataType,
+                            value: nodeValueGenerators[nodeId]()
+                        }
+                    );
+                },
+                set: (variant) => {
+                    console.log(`set called for ${node.browseName}`);
+                    return opcua.StatusCodes.Good;
+                }
+            }, {overwrite: true});
+            node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite"); // without write flag here no one can write at all
+            node.accessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
+            node.permissions = {
+                CurrentRead: ['*'],
+                CurrentWrite: ['!*', 'admin'] // ... but guest can also do this?
             }
-        }, {overwrite: true});
-        node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite"); // without write flag here no one can write at all
-        node.accessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
-        node.permissions = {
-            CurrentRead: ['*'],
-            CurrentWrite: ['!*', 'admin'] // ... but guest can also do this?
         }
     }
 
