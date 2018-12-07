@@ -43,14 +43,13 @@ return server.start((err) => {
                 console.log('this never gets called anyways :(');
                 return opcua.StatusCodes.Good;
             },
-            // does this even do anything?
-            userAccessLevel: opcua.makeAccessLevel("CurrentRead | CurrentWrite"),
-            accessLevel: opcua.makeAccessLevel("CurrentRead | CurrentWrite"),
             permissions: {
                 CurrentRead: ["*"], // everyone
                 CurrentWrite: ["*"] // everyone
             }
         }, {overwrite: true});
+        node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
+        node.accessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
     }
 
     const endpoints = server.endpoints[0].endpointDescriptions();
