@@ -6,6 +6,8 @@ A [short, self contained and correct (compilable) example](http://sscce.org/) fo
 
 This repo was created for [this issue](https://github.com/node-opcua/node-opcua/issues/569).
 
+**The issue has been solved.**
+
 ![screencap](screencap.jpg)
 
 # Installation
