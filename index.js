@@ -65,7 +65,7 @@ return server.start((err) => {
                     );
                 },
                 set: (variant) => {
-                    console.log(`set called for ${node.browseName}`);
+                    console.log(`set called for node '${node.browseName}', value: '${variant.value}' (${variant.dataType.key})`);
                     return opcua.StatusCodes.Good;
                 }
             }, {overwrite: true});
