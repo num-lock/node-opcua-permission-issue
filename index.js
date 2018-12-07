@@ -11,12 +11,18 @@ const server = new opcua.OPCUAServer({
     ],
     userManager: {
         isValidUser: (username, password) => {
-            // for this demonstration just accept all credentials ...
-            return true;
+            if (username === 'admin') {
+                return password === 'admin';
+            } else if (username === 'guest') {
+                return password === 'guest';
+            }
+            return false;
         },
         getUserRole: (username) => {
-            // for this demonstration everyone is an admin ...
-            return 'admin';
+            if (username === 'admin') {
+                return 'admin';
+            }
+            return 'default';
         }
     },
     allowAnonymous: false
@@ -41,16 +47,15 @@ return server.start((err) => {
                 );
             },
             set: (variant) => {
-                console.log('this never gets called anyways :(');
                 return opcua.StatusCodes.Good;
-            },
-            permissions: {
-                CurrentRead: ["*"], // everyone
-                CurrentWrite: ["*"] // everyone
             }
         }, {overwrite: true});
-        node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
+        node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite"); // without write flag here no one can write at all
         node.accessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
+        node.permissions = {
+            CurrentRead: ['*'],
+            CurrentWrite: ['!*', 'admin'] // ... but guest can also do this?
+        }
     }
 
     const endpoints = server.endpoints[0].endpointDescriptions();
