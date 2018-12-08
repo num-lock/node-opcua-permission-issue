@@ -69,12 +69,10 @@ return server.start((err) => {
                     return opcua.StatusCodes.Good;
                 }
             }, {overwrite: true});
-            node.userAccessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite"); // without write flag here no one can write at all
-            node.accessLevel = opcua.makeAccessLevel("CurrentRead | CurrentWrite");
-            node.permissions = {
+            node.setPermissions({
                 CurrentRead: ['*'],
-                CurrentWrite: ['!*', 'admin'] // ... but guest can also do this?
-            }
+                CurrentWrite: ['!*', 'admin']
+            });
         }
     }
 
